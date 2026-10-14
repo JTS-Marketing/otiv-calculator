@@ -65,7 +65,7 @@ h1 {
 .field { display: flex; flex-direction: column; gap: 10px; }
 .field-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
 .field label { font-size: 16px; color: var(--muted); }
-.field output { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
+.field output { font-size: 24px; font-weight: 600; color: var(--text); white-space: nowrap; }
 .hint { margin: 0; font-size: 13px; color: var(--faint); }
 input[type=range] {
   -webkit-appearance: none; appearance: none;
@@ -94,8 +94,8 @@ input[type=range]:focus-visible { outline: 2px solid var(--accent-soft); outline
   padding: 22px 26px; display: flex; flex-direction: column; gap: 4px;
 }
 .card .k { font-size: 15px; color: var(--muted); }
-.card .v { font-size: clamp(30px, 3.4vw, 42px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
-.card .s { font-size: 14px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.card .v { font-size: clamp(30px, 3.4vw, 42px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; white-space: nowrap; }
+.card .s { font-size: 14px; color: var(--faint); }
 .bar { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; margin-top: 10px; }
 .bar span { display: block; height: 100%; border-radius: 4px; background: var(--accent-soft); transition: width 0.25s ease; }
 .bar.today span { background: var(--text); }
@@ -104,8 +104,8 @@ input[type=range]:focus-visible { outline: 2px solid var(--accent-soft); outline
   display: flex; flex-direction: column; gap: 6px;
 }
 .save .k { font-size: 16px; color: var(--text); }
-.save .v { font-size: clamp(40px, 5vw, 64px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.04; color: #FFFFFF; font-variant-numeric: tabular-nums; }
-.save .s { font-size: 15px; color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+.save .v { font-size: clamp(40px, 5vw, 64px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.04; color: #FFFFFF; }
+.save .s { font-size: 15px; color: rgba(255, 255, 255, 0.85); }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 480px) { .two { grid-template-columns: 1fr; } }
 footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 13px; color: var(--faint); }
@@ -220,10 +220,10 @@ footer p { margin: 0; max-width: 80ch; }
     const costToday = hoursToday * rate, costOtiv = hoursOtiv * rate;
     const saving = costToday - costOtiv;
 
-    $("today").textContent = euro(costToday) + " / year";
-    $("today-h").textContent = nf.format(Math.round(hoursToday)) + " staff hours";
-    $("otiv").textContent = euro(costOtiv) + " / year";
-    $("otiv-h").textContent = nf.format(Math.round(hoursOtiv)) + " staff hours";
+    $("today").textContent = euro(costToday);
+    $("today-h").textContent = "per year · " + nf.format(Math.round(hoursToday)) + " staff hours";
+    $("otiv").textContent = euro(costOtiv);
+    $("otiv-h").textContent = "per year · " + nf.format(Math.round(hoursOtiv)) + " staff hours";
     const max = Math.max(costToday, costOtiv, 1);
     $("today-bar").style.width = (costToday / max * 100) + "%";
     $("otiv-bar").style.width = (costOtiv / max * 100) + "%";
