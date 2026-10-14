@@ -1,0 +1,246 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>OTIV.THREE Savings Calculator</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 64 64%27%3E%3Crect width=%2764%27 height=%2764%27 rx=%2714%27 fill=%27%230F2A44%27/%3E%3Crect x=%2712%27 y=%2730%27 width=%2740%27 height=%276%27 rx=%273%27 fill=%27%23296886%27/%3E%3Ccircle cx=%2738%27 cy=%2733%27 r=%279%27 fill=%27%23E8F0F6%27/%3E%3C/svg%3E">
+<meta property="og:title" content="OTIV.THREE Savings Calculator">
+<meta property="og:description" content="What does shunting cost you today? A concept mock-up by Jan Siewert.">
+<meta name="theme-color" content="#0F2A44">
+<meta name="description" content="Concept mock-up: what a yard spends on shunting today, and what remote operation with OTIV.THREE would save.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Schibsted+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: one dark page in the OTIV.THREE site language — a rounded "island" holding inputs left, live results right; stacks on phones. */
+:root {
+  --navy: #0F2A44;
+  --island: rgba(255, 255, 255, 0.05);
+  --card: rgba(255, 255, 255, 0.043);
+  --line: rgba(255, 255, 255, 0.1);
+  --text: #E8F0F6;
+  --muted: rgba(232, 240, 246, 0.7);
+  --faint: rgba(232, 240, 246, 0.5);
+  --accent: #296886;
+  --accent-soft: #8FBDD4;
+  --track: rgba(255, 255, 255, 0.15);
+  --font: "Schibsted Grotesk", "Helvetica Neue", Arial, sans-serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--navy); margin: 0; }
+body {
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.5;
+  padding-inline: clamp(16px, 4vw, 56px);
+  padding-block: clamp(24px, 5vw, 64px);
+}
+.wrap { max-width: 1180px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.eyebrow {
+  margin: 0;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--faint);
+}
+header { display: flex; flex-direction: column; gap: 14px; max-width: 760px; }
+h1 {
+  margin: 0;
+  font-size: clamp(34px, 5vw, 56px); font-weight: 600; line-height: 1.06; letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+.lead { margin: 0; font-size: 18px; color: var(--muted); max-width: 62ch; }
+.island {
+  background: var(--island);
+  border: 1px solid var(--line);
+  border-radius: 32px;
+  padding: clamp(22px, 4vw, 56px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
+  gap: clamp(28px, 4vw, 64px);
+}
+@media (max-width: 860px) { .island { grid-template-columns: minmax(0, 1fr); } }
+.inputs { display: flex; flex-direction: column; gap: 26px; min-width: 0; }
+.group-label { margin: 0; font-size: 13px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--accent-soft); }
+.field { display: flex; flex-direction: column; gap: 10px; }
+.field-top { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.field label { font-size: 16px; color: var(--muted); }
+.field output { font-size: 24px; font-weight: 600; font-variant-numeric: tabular-nums; color: var(--text); white-space: nowrap; }
+.hint { margin: 0; font-size: 13px; color: var(--faint); }
+input[type=range] {
+  -webkit-appearance: none; appearance: none;
+  width: 100%; height: 28px; background: transparent; margin: 0; cursor: pointer;
+}
+input[type=range]::-webkit-slider-runnable-track {
+  height: 6px; border-radius: 3px;
+  background: linear-gradient(to right, var(--accent) 0 var(--p, 50%), var(--track) var(--p, 50%) 100%);
+}
+input[type=range]::-moz-range-track { height: 6px; border-radius: 3px; background: var(--track); }
+input[type=range]::-moz-range-progress { height: 6px; border-radius: 3px; background: var(--accent); }
+input[type=range]::-webkit-slider-thumb {
+  -webkit-appearance: none; appearance: none;
+  width: 24px; height: 24px; border-radius: 50%; margin-top: -9px;
+  background: #FFFFFF; border: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+input[type=range]::-moz-range-thumb {
+  width: 24px; height: 24px; border-radius: 50%; background: #FFFFFF; border: 0; box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+}
+input[type=range]:focus-visible { outline: 2px solid var(--accent-soft); outline-offset: 4px; border-radius: 8px; }
+.divider { height: 1px; background: var(--line); }
+
+.results { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.card {
+  background: var(--card); border: 1px solid var(--line); border-radius: 26px;
+  padding: 22px 26px; display: flex; flex-direction: column; gap: 4px;
+}
+.card .k { font-size: 15px; color: var(--muted); }
+.card .v { font-size: clamp(30px, 3.4vw, 42px); font-weight: 600; letter-spacing: -0.02em; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.card .s { font-size: 14px; color: var(--faint); font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 4px; background: var(--track); overflow: hidden; margin-top: 10px; }
+.bar span { display: block; height: 100%; border-radius: 4px; background: var(--accent-soft); transition: width 0.25s ease; }
+.bar.today span { background: var(--text); }
+.save {
+  background: var(--accent); border-radius: 26px; padding: 26px 28px;
+  display: flex; flex-direction: column; gap: 6px;
+}
+.save .k { font-size: 16px; color: var(--text); }
+.save .v { font-size: clamp(40px, 5vw, 64px); font-weight: 600; letter-spacing: -0.03em; line-height: 1.04; color: #FFFFFF; font-variant-numeric: tabular-nums; }
+.save .s { font-size: 15px; color: rgba(255, 255, 255, 0.85); font-variant-numeric: tabular-nums; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 480px) { .two { grid-template-columns: 1fr; } }
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 24px; font-size: 13px; color: var(--faint); }
+footer p { margin: 0; max-width: 80ch; }
+@media (prefers-reduced-motion: reduce) { .bar span { transition: none; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <p class="eyebrow">OTIV.THREE · Savings calculator · Concept mock-up</p>
+    <h1>What does shunting cost you today?</h1>
+    <p class="lead">Set the sliders to your own yard. You see roughly what you spend now, and what remote operation with OTIV.THREE would save you.</p>
+  </header>
+
+  <section class="island" aria-label="Calculator">
+    <div class="inputs">
+      <p class="group-label">Your yard today</p>
+      <div class="field">
+        <div class="field-top"><label for="moves">Shunting movements per day</label><output id="moves-o" for="moves"></output></div>
+        <input id="moves" type="range" min="10" max="500" step="10" value="120">
+      </div>
+      <div class="field">
+        <div class="field-top"><label for="staff">Staff per movement</label><output id="staff-o" for="staff"></output></div>
+        <input id="staff" type="range" min="1" max="4" step="1" value="2">
+        <p class="hint">Driver plus shunter on the ground is two.</p>
+      </div>
+      <div class="field">
+        <div class="field-top"><label for="mins">Minutes per movement</label><output id="mins-o" for="mins"></output></div>
+        <input id="mins" type="range" min="10" max="90" step="5" value="30">
+        <p class="hint">Including walking to the locomotive and back.</p>
+      </div>
+      <div class="field">
+        <div class="field-top"><label for="days">Operating days per year</label><output id="days-o" for="days"></output></div>
+        <input id="days" type="range" min="100" max="365" step="5" value="300">
+      </div>
+      <div class="field">
+        <div class="field-top"><label for="rate">Cost per staff hour</label><output id="rate-o" for="rate"></output></div>
+        <input id="rate" type="range" min="40" max="120" step="1" value="75">
+        <p class="hint">€75 matches a published German rail staffing tariff.</p>
+      </div>
+      <div class="divider"></div>
+      <p class="group-label">With OTIV.THREE</p>
+      <div class="field">
+        <div class="field-top"><label for="remote">Remote operators per movement</label><output id="remote-o" for="remote"></output></div>
+        <input id="remote" type="range" min="0.25" max="2" step="0.25" value="1">
+        <p class="hint">Below 1 means one operator handles several vehicles in turn.</p>
+      </div>
+    </div>
+
+    <div class="results" aria-live="polite">
+      <div class="two">
+        <div class="card">
+          <span class="k">Your shunting today, roughly</span>
+          <span class="v" id="today">–</span>
+          <span class="s" id="today-h">–</span>
+          <div class="bar today"><span id="today-bar" style="width:100%"></span></div>
+        </div>
+        <div class="card">
+          <span class="k">With OTIV.THREE</span>
+          <span class="v" id="otiv">–</span>
+          <span class="s" id="otiv-h">–</span>
+          <div class="bar"><span id="otiv-bar" style="width:50%"></span></div>
+        </div>
+      </div>
+      <div class="save">
+        <span class="k">What OTIV.THREE saves you</span>
+        <span class="v" id="save">–</span>
+        <span class="s" id="save-s">–</span>
+      </div>
+      <div class="card">
+        <span class="k">Per shunting movement</span>
+        <span class="v" id="per">–</span>
+        <span class="s">Staff cost today, versus with remote operation</span>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <p>Concept mock-up with example values, prepared by Jan Siewert. Not an official OTIV tool and not a quote. Counts staff time only; system cost is not included.</p>
+  </footer>
+</div>
+
+<script>
+(function () {
+  const ids = ["moves", "staff", "mins", "days", "rate", "remote"];
+  const el = Object.fromEntries(ids.map(id => [id, document.getElementById(id)]));
+  const $ = id => document.getElementById(id);
+  const nf = new Intl.NumberFormat("en-GB");
+  function euro(x) {
+    if (x >= 1e6) return "€" + (x / 1e6).toFixed(x >= 1e7 ? 1 : 2).replace(/\.?0+$/, "") + "M";
+    if (x >= 1e3) return "€" + Math.round(x / 1e3) + "k";
+    return "€" + Math.round(x);
+  }
+  function fill(input) {
+    const p = (input.value - input.min) / (input.max - input.min) * 100;
+    input.style.setProperty("--p", p + "%");
+  }
+  function update() {
+    const moves = +el.moves.value, staff = +el.staff.value, mins = +el.mins.value,
+          days = +el.days.value, rate = +el.rate.value, remote = +el.remote.value;
+    $("moves-o").textContent = nf.format(moves);
+    $("staff-o").textContent = staff === 1 ? "1 person" : staff + " people";
+    $("mins-o").textContent = mins + " min";
+    $("days-o").textContent = days;
+    $("rate-o").textContent = "€" + rate;
+    $("remote-o").textContent = remote.toString();
+    ids.forEach(id => fill(el[id]));
+
+    const hoursToday = moves * staff * (mins / 60) * days;
+    const hoursOtiv = moves * remote * (mins / 60) * days;
+    const costToday = hoursToday * rate, costOtiv = hoursOtiv * rate;
+    const saving = costToday - costOtiv;
+
+    $("today").textContent = euro(costToday) + " / year";
+    $("today-h").textContent = nf.format(Math.round(hoursToday)) + " staff hours";
+    $("otiv").textContent = euro(costOtiv) + " / year";
+    $("otiv-h").textContent = nf.format(Math.round(hoursOtiv)) + " staff hours";
+    const max = Math.max(costToday, costOtiv, 1);
+    $("today-bar").style.width = (costToday / max * 100) + "%";
+    $("otiv-bar").style.width = (costOtiv / max * 100) + "%";
+
+    if (saving > 0) {
+      $("save").textContent = euro(saving) + " a year";
+      $("save-s").textContent = nf.format(Math.round(hoursToday - hoursOtiv)) + " staff hours freed · " + Math.round(saving / costToday * 100) + "% less than today";
+    } else {
+      $("save").textContent = "No saving";
+      $("save-s").textContent = "With this many remote operators per movement there is nothing to gain on staff time.";
+    }
+    const perToday = staff * mins / 60 * rate, perOtiv = remote * mins / 60 * rate;
+    $("per").textContent = "€" + Math.round(perToday) + " → €" + Math.round(perOtiv);
+  }
+  ids.forEach(id => el[id].addEventListener("input", update));
+  update();
+})();
+</script>
+</body>
+</html>
